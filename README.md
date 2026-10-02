@@ -17,7 +17,7 @@ Open http://localhost:8123. Use an HTTP server rather than opening `index.html` 
 - True black background, silver typography, studio-lit metal, and a responsive layout.
 - A continuously breathing metal orb with flowing surface currents, gentle rotation, iridescent reflections, and pointer-driven surface ripples, attraction, and rotation.
 - The pause/play button controls ambient motion. Reduced-motion preferences start the scene paused. Rendering sleeps when the sculpture is offscreen or the tab is hidden.
-- The orb grows smoothly from 72% to its final size over 2.8 seconds on reload, then stops growing. A matching iridescent chrome image remains underneath the canvas and supplies the fallback if WebGL is unavailable. The live scene fades in only after its reflection environment and foil texture are ready.
+- The orb appears at its final size with no growth or scale animation. A matching iridescent chrome image sits underneath the canvas and is what you see until WebGL is ready, and remains the fallback if WebGL is unavailable. The live scene fades in over 1.4 seconds once its reflection environment and foil texture are ready.
 - The selected Full foil finish is fixed at 80% iridescence. Temporary comparison controls have been removed; previous browser preferences no longer affect the finish.
 
 ## Files
@@ -36,4 +36,8 @@ Google Fonts supplies Inter and Space Grotesk; system sans-serif fonts are used 
 
 ## Deployment
 
+Live at https://zyphrlabs.github.io/.
+
 The existing `.github/workflows/pages.yml` publishes this static directory to GitHub Pages on pushes to `main` or manual dispatch. There is no build step.
+
+Because the site is served from the repository root, every asset reference must stay relative. Absolute paths such as `/assets/orb-fallback.jpg` resolve against the domain root and will 404 if the site is ever moved into a project subdirectory.
