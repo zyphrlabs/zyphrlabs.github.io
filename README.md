@@ -17,16 +17,15 @@ Open http://localhost:8123. Use an HTTP server rather than opening `index.html` 
 - True black background, silver typography, studio-lit metal, and a responsive layout.
 - A continuously breathing metal orb with flowing surface currents, gentle rotation, iridescent reflections, and pointer-driven surface ripples, attraction, and rotation.
 - The pause/play button controls ambient motion. Reduced-motion preferences start the scene paused. Rendering sleeps when the sculpture is offscreen or the tab is hidden.
-- The orb appears at its final size with no growth or scale animation. A matching iridescent chrome image sits underneath the canvas and is what you see until WebGL is ready, and remains the fallback if WebGL is unavailable. The live scene fades in over 1.4 seconds once its reflection environment and foil texture are ready.
+- The orb appears at its final size with no growth or scale animation, and there is no static stand-in image. The canvas starts rendering on its first frame from a procedural studio, then fades up from the black background over 1.4 seconds, so the photographic environment and foil texture normally arrive while the surface is still dim and their upgrade is not visible.
 - The selected Full foil finish is fixed at 80% iridescence. Temporary comparison controls have been removed; previous browser preferences no longer affect the finish.
 
 ## Files
 
 - `index.html`: minimal hero, launch note, and one footer contact link.
-- `styles.css`: typography, layout, breakpoints, and static fallback.
+- `styles.css`: typography, layout, breakpoints, and the canvas fade-in.
 - `app.js`: physical metal material, custom studio reflections, living surface displacement, prismatic reflection treatment, the fixed Full foil finish, and motion controls.
 - `vendor/`: Three.js r166.1 and its RGBE loader, vendored locally under the MIT license.
-- `assets/orb-fallback.jpg`: matching static capture of the 80% Full foil orb.
 - `assets/iridescent-foil.png`: the supplied holographic foil reference, sampled across the surface for flowing color and detail.
 - `assets/studio-small-09.hdr`: Studio Small 09 by Poly Haven, licensed CC0, lightly masked at load time to retain neutral chrome reflections with an iridescent accent. A procedural studio supplies reflections if it cannot load.
 
@@ -40,4 +39,4 @@ Live at https://zyphrlabs.github.io/.
 
 The existing `.github/workflows/pages.yml` publishes this static directory to GitHub Pages on pushes to `main` or manual dispatch. There is no build step.
 
-Because the site is served from the repository root, every asset reference must stay relative. Absolute paths such as `/assets/orb-fallback.jpg` resolve against the domain root and will 404 if the site is ever moved into a project subdirectory.
+Because the site is served from the repository root, every asset reference must stay relative. Absolute paths such as `/assets/iridescent-foil.png` resolve against the domain root and will 404 if the site is ever moved into a project subdirectory.

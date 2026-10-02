@@ -215,8 +215,6 @@ function createSculpture() {
   let visible = true;
   let disposed = false;
   let firstFrame = true;
-  let lightingReady = false;
-  let foilReady = false;
   let hoverTarget = 0;
   let interactionUntil = 0;
   const pointer = new THREE.Vector2();
@@ -240,7 +238,7 @@ function createSculpture() {
   }
   function render(now) {
     raf = 0;
-    if (disposed || !lightingReady || !foilReady) return;
+    if (disposed) return;
     const dt = Math.min((now - (lastTime || now)) / 1000, .05);
     lastTime = now;
     const ease = motionPreference.matches ? 1 : 1 - Math.exp(-dt * 5);
@@ -341,11 +339,9 @@ function createSculpture() {
     texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
     foilMap.value = texture;
     foilPlaceholder.dispose();
-    foilReady = true;
     requestRender();
   }, undefined, () => {
-    foilReady = true;
-    requestRender();
+    // The flat placeholder stands in if the foil can't load.
   });
   new RGBELoader().load('./assets/studio-small-09.hdr', texture => {
     if (disposed) { texture.dispose(); return; }
@@ -373,12 +369,10 @@ function createSculpture() {
     texture.dispose();
     environment.dispose();
     generator.dispose();
-    lightingReady = true;
     requestRender();
   }, undefined, () => {
-    // Retain the procedural studio if the photographic environment can't load.
-    lightingReady = true;
-    requestRender();
+    // The procedural studio built at startup keeps lighting the orb if the
+    // photographic environment can't load.
   });
 }
 
