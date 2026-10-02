@@ -58,18 +58,16 @@ h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(64px, 7.05vw, 10
   .footer { min-height: 62px; }
 }
 @media (max-width: 760px) {
-  .site-shell { padding-inline: 26px; height: 100svh; overflow: hidden; }
-  main { min-height: 0; }
-  .nav { min-height: 72px; }
+  .site-shell { padding-inline: 26px; }
+  .nav { min-height: 84px; }
   .brand > span { font-size: 15px; }
-  .hero { display: flex; flex-direction: column; align-items: stretch; padding-block: 20px 12px; min-height: 0; }
+  .hero { display: flex; flex-direction: column; align-items: stretch; padding-block: 55px 28px; min-height: 0; }
   .hero-copy { padding: 0; }
   h1 { font-size: clamp(54px,11.2vw,83px); }
-  .launch-note { margin-top: 18px; }
-  .artwork { margin: 8px -18px 0; flex: 1; min-height: 0; }
-  .artwork-stage { height: auto; flex: 1; min-height: 0; }
+  .artwork { margin: 16px -18px 0; }
+  .artwork-stage { height: clamp(320px,87vw,530px); }
   .motion-toggle { right: 19px; bottom: 15px; }
-  .footer { min-height: 64px; font-size: 9px; }
+  .footer { min-height: 77px; font-size: 9px; }
 }
 @media (max-width: 360px) {
   .site-shell { padding-inline: 20px; }
