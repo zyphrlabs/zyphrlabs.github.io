@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>Zyphr — Building the future.</title>
+  <meta name="description" content="Zyphr. Building the future. Unveiling soon.">
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="site-shell">
+    <header class="nav">
+      <a class="brand" href="./" aria-label="Zyphr home">
+        <span>ZYPHR</span>
+      </a>
+    </header>
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <h1 id="hero-title">Building<br><span class="metal-type">the future.</span></h1>
+          <p class="launch-note">Unveiling soon.</p>
+        </div>
+        <figure class="artwork" aria-label="Iridescent metal sculpture">
+          <div class="artwork-stage" id="artwork-stage">
+            <div class="orb-visuals">
+              <img class="sculpture-fallback" src="assets/orb-fallback.jpg" alt="" aria-hidden="true" width="510" height="510" fetchpriority="high">
+              <canvas id="webgl" role="img" aria-label="A living metallic orb with iridescent reflections that responds to pointer movement."></canvas>
+            </div>
+            <button class="motion-toggle" type="button" aria-label="Pause sculpture motion" aria-pressed="false" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path class="pause-icon" d="M5 4v8M11 4v8"/><path class="play-icon" d="m5 3 7 5-7 5Z"/></svg></button>
+          </div>
+        </figure>
+      </section>
+    </main>
+    <footer class="footer"><span>© 2026 Zyphr</span><a class="contact-link" href="mailto:hello@zyphrlabs.com">Get in touch</a></footer>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
