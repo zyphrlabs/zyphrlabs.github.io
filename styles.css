@@ -49,11 +49,8 @@ h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(64px, 7.05vw, 10
 .privacy-main { flex: 1; display: block; }
 .privacy-copy { max-width: 780px; margin: 0 auto; padding: clamp(48px, 8vw, 100px) 0 80px; }
 .privacy-copy h1 { white-space: normal; font-size: clamp(42px, 6vw, 64px); letter-spacing: -.055em; }
-.policy-picker { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-top: 24px; }
-.policy-picker label { color: #777; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
-.policy-picker select { appearance: none; min-width: 190px; height: 46px; padding: 0 42px 0 14px; border: 1px solid #383838; border-radius: 10px; background-color: #111; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m1 1 5 5 5-5' fill='none' stroke='%23999' stroke-width='1.5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; color: #eee; font: 500 14px/1 'Inter', sans-serif; cursor: pointer; transition: border-color .2s, background-color .2s; }
-.policy-picker select:hover { border-color: #666; background-color: #161616; }
-.policy-picker select:focus-visible { outline: 2px solid #aaa; outline-offset: 3px; }
+.policy-product { display: inline-flex; align-items: center; gap: 9px; margin-top: 24px; padding: 9px 13px; border: 1px solid #343434; border-radius: 999px; background: linear-gradient(145deg, #151515, #0c0c0c); color: #e8e8e8; font-size: 13px; font-weight: 500; letter-spacing: .01em; }
+.policy-product-dot { width: 7px; height: 7px; border-radius: 50%; background: #aaa; box-shadow: 0 0 9px #aaa6; }
 .privacy-copy h2 { margin: 42px 0 12px; font: 500 19px/1.35 'Space Grotesk', sans-serif; letter-spacing: -.02em; }
 .privacy-copy p, .privacy-copy li { max-width: 72ch; color: #b8b8bd; font-size: 15px; line-height: 1.75; }
 .privacy-copy p { margin: 14px 0; }

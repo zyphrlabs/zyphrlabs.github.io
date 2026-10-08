@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../styles.css?v=20261009-2">
+  <link rel="stylesheet" href="../styles.css?v=20261009-3">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -22,12 +22,7 @@
     <main class="privacy-main" id="main">
       <article class="privacy-copy">
         <h1>Privacy Policy</h1>
-        <div class="policy-picker">
-          <label for="policy-product">Policy for</label>
-          <select id="policy-product" name="product">
-            <option value="trove" selected>Trove</option>
-          </select>
-        </div>
+        <div class="policy-product" aria-label="Product: Trove"><span class="policy-product-dot" aria-hidden="true"></span><span>Trove</span></div>
         <p class="privacy-updated">Trove · Effective October 9, 2026</p>
 
         <p>Trove is a personal memory app operated by Zyphr (“we,” “us,” or “our”). This policy applies only to Trove; it does not cover other Zyphr products or services. It explains what information Trove handles, why it is used, and the choices available to you.</p>
@@ -42,8 +37,6 @@
         <h2>How information is used</h2>
         <p>We use this information to authenticate you, save and sync your memories, organize and search your library, provide exports, prevent unauthorized access, and respond to support requests. Trove does not display third-party ads or sell personal information.</p>
         <p>When embeddings are enabled for an account, Trove sends relevant memory text or images, and semantic-search query text, to Google Cloud Vertex AI to create embeddings. Trove uses those embeddings for semantic search and related-memory features. Trove does not use this service to generate written answers or summaries.</p>
-        <p>When you save a link, Trove may fetch that URL to extract page information for the saved memory. The website may receive a standard network request from Trove’s servers.</p>
-
         <h2>Service providers</h2>
         <p>Supabase provides sign-in and stores your account data and files. Heroku runs the Trove API that handles requests from the app. If you enable semantic search, Trove sends relevant memory text or images to Google Cloud Vertex AI to create embeddings. These providers process information on Trove’s behalf to provide these features. The mobile app accesses your files through Trove’s API.</p>
 
