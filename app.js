@@ -1,5 +1,8 @@
 import * as THREE from './vendor/three.module.min.js';
 import { RGBELoader } from './vendor/RGBELoader.js';
+import { mark, report } from './telemetry.js';
+
+mark('module');
 
 const stage = document.getElementById('artwork-stage');
 const canvas = document.getElementById('webgl');
@@ -260,6 +263,9 @@ function createSculpture() {
       firstFrame = false;
       stage.classList.add('is-ready');
       motionButton.hidden = false;
+      mark('firstFrame');
+      requestAnimationFrame(loadSurfaces);
+      report();
     }
     if (!paused || now < interactionUntil) requestRender();
   }
@@ -332,48 +338,58 @@ function createSculpture() {
     motionButton.hidden = true;
   });
   resize();
-  new THREE.TextureLoader().load('./assets/iridescent-foil.png', texture => {
-    if (disposed) { texture.dispose(); return; }
-    texture.colorSpace = THREE.SRGBColorSpace;
-    texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-    texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
-    foilMap.value = texture;
-    foilPlaceholder.dispose();
-    requestRender();
-  }, undefined, () => {
-    // The flat placeholder stands in if the foil can't load.
-  });
-  new RGBELoader().load('./assets/studio-small-09.hdr', texture => {
-    if (disposed) { texture.dispose(); return; }
-    // Preserve neutral photographic reflections so the surface reads as chrome.
-    // Moderate flags control broad highlights, with a faint prismatic accent.
-    const { data, width, height } = texture.image;
-    for (let y = 0; y < height; y++) {
-      const v = y / height;
-      for (let x = 0; x < width; x++) {
-        const u = x / width;
-        const index = (y * width + x) * 4;
-        const bands = .57 + .43 * Math.pow(Math.abs(Math.sin(v * Math.PI * 3 + Math.sin(u * Math.PI * 4) * .3)), 4);
-        for (let channel = 0; channel < 3; channel++) {
-          const radiance = THREE.DataUtils.fromHalfFloat(data[index + channel]);
-          const hue = .9 + .1 * Math.cos(Math.PI * 2 * (u * 1.5 + v * .8 + [0, .33, .67][channel]));
-          data[index + channel] = THREE.DataUtils.toHalfFloat(radiance / (1 + radiance * .12) * bands * hue);
+  // Neither surface is needed for the first frame, so both requests wait for it.
+  function loadSurfaces() {
+    if (disposed) return;
+    new THREE.TextureLoader().load('./assets/iridescent-foil.webp', texture => {
+      if (disposed) { texture.dispose(); return; }
+      texture.colorSpace = THREE.SRGBColorSpace;
+      texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
+      texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+      foilMap.value = texture;
+      foilPlaceholder.dispose();
+      mark('foil');
+      report();
+      requestRender();
+    }, undefined, () => {
+      // The flat placeholder stands in if the foil can't load.
+      report();
+    });
+    new RGBELoader().load('./assets/studio-512.hdr', texture => {
+      if (disposed) { texture.dispose(); return; }
+      // Preserve neutral photographic reflections so the surface reads as chrome.
+      // Moderate flags control broad highlights, with a faint prismatic accent.
+      const { data, width, height } = texture.image;
+      for (let y = 0; y < height; y++) {
+        const v = y / height;
+        for (let x = 0; x < width; x++) {
+          const u = x / width;
+          const index = (y * width + x) * 4;
+          const bands = .57 + .43 * Math.pow(Math.abs(Math.sin(v * Math.PI * 3 + Math.sin(u * Math.PI * 4) * .3)), 4);
+          for (let channel = 0; channel < 3; channel++) {
+            const radiance = THREE.DataUtils.fromHalfFloat(data[index + channel]);
+            const hue = .9 + .1 * Math.cos(Math.PI * 2 * (u * 1.5 + v * .8 + [0, .33, .67][channel]));
+            data[index + channel] = THREE.DataUtils.toHalfFloat(radiance / (1 + radiance * .12) * bands * hue);
+          }
         }
       }
-    }
-    texture.needsUpdate = true;
-    const generator = new THREE.PMREMGenerator(renderer);
-    const photographicEnvironment = generator.fromEquirectangular(texture);
-    scene.environment = photographicEnvironment.texture;
-    scene.environmentRotation.set(0, .55, 0);
-    texture.dispose();
-    environment.dispose();
-    generator.dispose();
-    requestRender();
-  }, undefined, () => {
-    // The procedural studio built at startup keeps lighting the orb if the
-    // photographic environment can't load.
-  });
+      texture.needsUpdate = true;
+      const generator = new THREE.PMREMGenerator(renderer);
+      const photographicEnvironment = generator.fromEquirectangular(texture);
+      scene.environment = photographicEnvironment.texture;
+      scene.environmentRotation.set(0, .55, 0);
+      texture.dispose();
+      environment.dispose();
+      generator.dispose();
+      mark('env');
+      report();
+      requestRender();
+    }, undefined, () => {
+      // The procedural studio built at startup keeps lighting the orb if the
+      // photographic environment can't load.
+      report();
+    });
+  }
 }
 
 try {
@@ -381,4 +397,6 @@ try {
 } catch (error) {
   console.warn('Interactive sculpture unavailable:', error.message);
   canvas.setAttribute('aria-label', 'Metallic sculpture preview');
+  mark('noWebGL');
+  report();
 }

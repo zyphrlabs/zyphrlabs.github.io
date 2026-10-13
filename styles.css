@@ -1,3 +1,20 @@
+/* Self-hosted variable fonts: the latin subsets Google Fonts served for this site. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/inter-latin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 :root {
   color-scheme: dark;
   --black: #000;
@@ -28,6 +45,7 @@ main { flex: 1; display: flex; flex-direction: column; }
 h1 { font-family: 'Space Grotesk', sans-serif; font-size: clamp(64px, 7.05vw, 108px); line-height: 1.035; font-weight: 400; letter-spacing: -.065em; margin: 0; white-space: nowrap; }
 .metal-type { background: linear-gradient(110deg,#b9bbc0 0%,#f9f9fa 16%,#9d9ca9 32%,#dfd5e6 44%,#b8c5cb 55%,#f2eeeb 68%,#a3a5a9 85%,#e4e3e8 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .launch-note { margin: 28px 0 0; font-size: 16px; line-height: 1.5; color: #999; letter-spacing: -.015em; }
+.launch-note a { color: #d5d5d5; text-decoration: underline; text-underline-offset: 3px; }
 .artwork { margin: 0 -24px 0 0; min-width: 0; align-self: stretch; display: flex; flex-direction: column; justify-content: center; position: relative; }
 .artwork-stage { position: relative; width: 100%; height: clamp(336px,calc((100svh - 260px) * .8),512px); isolation: isolate; }
 .orb-visuals { position: relative; width: 100%; height: 100%; }
