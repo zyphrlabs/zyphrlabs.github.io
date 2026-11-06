@@ -13,7 +13,7 @@ const IRIDESCENT_BALANCE = .8;
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 let paused = motionPreference.matches;
 
-function createSculpture() {
+async function createSculpture() {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'low-power' });
   renderer.setClearColor(0x000000, 1);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -23,58 +23,62 @@ function createSculpture() {
   const camera = new THREE.PerspectiveCamera(32, 1, .1, 50);
   camera.position.set(0, 0, 4.4);
 
-  // Neutral studio lights define the chrome. A separate holographic reflector
-  // supplies the flowing iridescent reflections, without coloring the backdrop.
-  const studio = new THREE.Scene();
-  studio.background = new THREE.Color(0x25262b);
-  const panelGeometry = new THREE.PlaneGeometry(1, 1);
-  const panelMaterials = [];
-  function softbox(position, size, color, intensity, map = null) {
-    const material = new THREE.MeshBasicMaterial({ color, map, side: THREE.DoubleSide });
-    material.color.multiplyScalar(intensity);
-    panelMaterials.push(material);
-    const panel = new THREE.Mesh(panelGeometry, material);
-    panel.position.set(...position);
-    panel.scale.set(...size, 1);
-    panel.lookAt(0, 0, 0);
-    studio.add(panel);
+  // Procedural stand-in, built only if the photographic environment can't load.
+  function buildFallbackEnvironment() {
+    // Neutral studio lights define the chrome. A separate holographic reflector
+    // supplies the flowing iridescent reflections, without coloring the backdrop.
+    const studio = new THREE.Scene();
+    studio.background = new THREE.Color(0x25262b);
+    const panelGeometry = new THREE.PlaneGeometry(1, 1);
+    const panelMaterials = [];
+    function softbox(position, size, color, intensity, map = null) {
+      const material = new THREE.MeshBasicMaterial({ color, map, side: THREE.DoubleSide });
+      material.color.multiplyScalar(intensity);
+      panelMaterials.push(material);
+      const panel = new THREE.Mesh(panelGeometry, material);
+      panel.position.set(...position);
+      panel.scale.set(...size, 1);
+      panel.lookAt(0, 0, 0);
+      studio.add(panel);
+    }
+    const reflectorCanvas = document.createElement('canvas');
+    reflectorCanvas.width = 512;
+    reflectorCanvas.height = 512;
+    const context = reflectorCanvas.getContext('2d');
+    const spectrum = context.createLinearGradient(0, 0, 512, 350);
+    [[0, '#7286cd'], [.18, '#9ed9db'], [.38, '#cec5e7'], [.57, '#d69fab'], [.76, '#e4d2a8'], [1, '#b2c8ed']]
+      .forEach(([stop, color]) => spectrum.addColorStop(stop, color));
+    context.fillStyle = spectrum;
+    context.fillRect(0, 0, 512, 512);
+    context.globalCompositeOperation = 'screen';
+    for (let i = 0; i < 4; i++) {
+      context.beginPath();
+      context.moveTo(-80, 70 + i * 140);
+      context.bezierCurveTo(90, -30 + i * 140, 230, 200 + i * 140, 580, 50 + i * 140);
+      context.strokeStyle = 'rgba(255,255,255,.5)';
+      context.lineWidth = 22;
+      context.shadowColor = '#fff';
+      context.shadowBlur = 35;
+      context.stroke();
+    }
+    const reflectorTexture = new THREE.CanvasTexture(reflectorCanvas);
+    reflectorTexture.colorSpace = THREE.SRGBColorSpace;
+    softbox([-3.5, 2.5, 3], [3.2, 5], 0xffffff, 3);
+    softbox([3.2, .5, 2.8], [.6, 5], 0xe4edff, 3.8);
+    softbox([.5, 4, -.5], [5, 1.2], 0xffffff, 3.8);
+    softbox([-1, -3, 2], [4, .65], 0xf2f1f7, 2.5);
+    softbox([2.8, 0, 1.4], [3, 5], 0xffffff, 2.3, reflectorTexture);
+    softbox([-2.2, -.6, -2.2], [3.5, 4], 0xffffff, 2, reflectorTexture);
+    softbox([.2, 2, -3], [4, 2.5], 0xffffff, 1.8, reflectorTexture);
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const environment = pmrem.fromScene(studio, 0);
+    scene.environment = environment.texture;
+    panelGeometry.dispose();
+    panelMaterials.forEach(material => material.dispose());
+    pmrem.dispose();
+    reflectorTexture.dispose();
+    return environment.texture;
   }
-  const reflectorCanvas = document.createElement('canvas');
-  reflectorCanvas.width = 512;
-  reflectorCanvas.height = 512;
-  const context = reflectorCanvas.getContext('2d');
-  const spectrum = context.createLinearGradient(0, 0, 512, 350);
-  [[0, '#7286cd'], [.18, '#9ed9db'], [.38, '#cec5e7'], [.57, '#d69fab'], [.76, '#e4d2a8'], [1, '#b2c8ed']]
-    .forEach(([stop, color]) => spectrum.addColorStop(stop, color));
-  context.fillStyle = spectrum;
-  context.fillRect(0, 0, 512, 512);
-  context.globalCompositeOperation = 'screen';
-  for (let i = 0; i < 4; i++) {
-    context.beginPath();
-    context.moveTo(-80, 70 + i * 140);
-    context.bezierCurveTo(90, -30 + i * 140, 230, 200 + i * 140, 580, 50 + i * 140);
-    context.strokeStyle = 'rgba(255,255,255,.5)';
-    context.lineWidth = 22;
-    context.shadowColor = '#fff';
-    context.shadowBlur = 35;
-    context.stroke();
-  }
-  const reflectorTexture = new THREE.CanvasTexture(reflectorCanvas);
-  reflectorTexture.colorSpace = THREE.SRGBColorSpace;
-  softbox([-3.5, 2.5, 3], [3.2, 5], 0xffffff, 3);
-  softbox([3.2, .5, 2.8], [.6, 5], 0xe4edff, 3.8);
-  softbox([.5, 4, -.5], [5, 1.2], 0xffffff, 3.8);
-  softbox([-1, -3, 2], [4, .65], 0xf2f1f7, 2.5);
-  softbox([2.8, 0, 1.4], [3, 5], 0xffffff, 2.3, reflectorTexture);
-  softbox([-2.2, -.6, -2.2], [3.5, 4], 0xffffff, 2, reflectorTexture);
-  softbox([.2, 2, -3], [4, 2.5], 0xffffff, 1.8, reflectorTexture);
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  const environment = pmrem.fromScene(studio, 0);
-  scene.environment = environment.texture;
-  panelGeometry.dispose();
-  panelMaterials.forEach(material => material.dispose());
-  pmrem.dispose();
-  reflectorTexture.dispose();
 
   const filmPixels = new Uint8Array(128 * 32 * 4);
   for (let y = 0; y < 32; y++) {
@@ -217,6 +221,7 @@ function createSculpture() {
   let lastTime = 0;
   let visible = true;
   let disposed = false;
+  let loaded = false;
   let firstFrame = true;
   let hoverTarget = 0;
   let interactionUntil = 0;
@@ -227,7 +232,7 @@ function createSculpture() {
   const hit = new THREE.Vector3();
   const hitSphere = new THREE.Sphere(new THREE.Vector3(), 1.13);
   function requestRender() {
-    if (!raf && !disposed && visible && !document.hidden) raf = requestAnimationFrame(render);
+    if (!raf && loaded && !disposed && visible && !document.hidden) raf = requestAnimationFrame(render);
   }
   function resize() {
     const { width, height } = stage.getBoundingClientRect();
@@ -264,7 +269,6 @@ function createSculpture() {
       stage.classList.add('is-ready');
       motionButton.hidden = false;
       mark('firstFrame');
-      requestAnimationFrame(loadSurfaces);
       report();
     }
     if (!paused || now < interactionUntil) requestRender();
@@ -337,63 +341,54 @@ function createSculpture() {
     stage.classList.remove('is-ready');
     motionButton.hidden = true;
   });
-  resize();
-  // Neither surface is needed for the first frame, so both requests wait for it.
-  function loadSurfaces() {
-    if (disposed) return;
-    new THREE.TextureLoader().load('./assets/iridescent-foil.webp', texture => {
-      if (disposed) { texture.dispose(); return; }
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.wrapS = texture.wrapT = THREE.ClampToEdgeWrapping;
-      texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
-      foilMap.value = texture;
-      foilPlaceholder.dispose();
-      mark('foil');
-      report();
-      requestRender();
-    }, undefined, () => {
-      // The flat placeholder stands in if the foil can't load.
-      report();
-    });
-    new RGBELoader().load('./assets/studio-512.hdr', texture => {
-      if (disposed) { texture.dispose(); return; }
-      // Preserve neutral photographic reflections so the surface reads as chrome.
-      // Moderate flags control broad highlights, with a faint prismatic accent.
-      const { data, width, height } = texture.image;
-      for (let y = 0; y < height; y++) {
-        const v = y / height;
-        for (let x = 0; x < width; x++) {
-          const u = x / width;
-          const index = (y * width + x) * 4;
-          const bands = .57 + .43 * Math.pow(Math.abs(Math.sin(v * Math.PI * 3 + Math.sin(u * Math.PI * 4) * .3)), 4);
-          for (let channel = 0; channel < 3; channel++) {
-            const radiance = THREE.DataUtils.fromHalfFloat(data[index + channel]);
-            const hue = .9 + .1 * Math.cos(Math.PI * 2 * (u * 1.5 + v * .8 + [0, .33, .67][channel]));
-            data[index + channel] = THREE.DataUtils.toHalfFloat(radiance / (1 + radiance * .12) * bands * hue);
-          }
+  // Load both surfaces before the first frame so the orb fades in finished,
+  // rather than rendering a stand-in and visibly swapping it a moment later.
+  const [foil, hdr] = await Promise.all([
+    new THREE.TextureLoader().loadAsync('./assets/iridescent-foil.webp').catch(() => null),
+    new RGBELoader().loadAsync('./assets/studio-512.hdr').catch(() => null),
+  ]);
+  if (disposed) return;
+  if (foil) {
+    foil.colorSpace = THREE.SRGBColorSpace;
+    foil.wrapS = foil.wrapT = THREE.ClampToEdgeWrapping;
+    foil.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+    foilMap.value = foil;
+    foilPlaceholder.dispose();
+    mark('foil');
+  }
+  if (hdr) {
+    // Preserve neutral photographic reflections so the surface reads as chrome.
+    // Moderate flags control broad highlights, with a faint prismatic accent.
+    const { data, width, height } = hdr.image;
+    for (let y = 0; y < height; y++) {
+      const v = y / height;
+      for (let x = 0; x < width; x++) {
+        const u = x / width;
+        const index = (y * width + x) * 4;
+        const bands = .57 + .43 * Math.pow(Math.abs(Math.sin(v * Math.PI * 3 + Math.sin(u * Math.PI * 4) * .3)), 4);
+        for (let channel = 0; channel < 3; channel++) {
+          const radiance = THREE.DataUtils.fromHalfFloat(data[index + channel]);
+          const hue = .9 + .1 * Math.cos(Math.PI * 2 * (u * 1.5 + v * .8 + [0, .33, .67][channel]));
+          data[index + channel] = THREE.DataUtils.toHalfFloat(radiance / (1 + radiance * .12) * bands * hue);
         }
       }
-      texture.needsUpdate = true;
-      const generator = new THREE.PMREMGenerator(renderer);
-      const photographicEnvironment = generator.fromEquirectangular(texture);
-      scene.environment = photographicEnvironment.texture;
-      scene.environmentRotation.set(0, .55, 0);
-      texture.dispose();
-      environment.dispose();
-      generator.dispose();
-      mark('env');
-      report();
-      requestRender();
-    }, undefined, () => {
-      // The procedural studio built at startup keeps lighting the orb if the
-      // photographic environment can't load.
-      report();
-    });
+    }
+    hdr.needsUpdate = true;
+    const generator = new THREE.PMREMGenerator(renderer);
+    scene.environment = generator.fromEquirectangular(hdr).texture;
+    scene.environmentRotation.set(0, .55, 0);
+    hdr.dispose();
+    generator.dispose();
+    mark('env');
+  } else {
+    scene.environment = buildFallbackEnvironment();
   }
+  loaded = true;
+  resize();
 }
 
 try {
-  createSculpture();
+  await createSculpture();
 } catch (error) {
   console.warn('Interactive sculpture unavailable:', error.message);
   canvas.setAttribute('aria-label', 'Metallic sculpture preview');
